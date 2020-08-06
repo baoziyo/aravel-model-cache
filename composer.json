@@ -1,0 +1,29 @@
+{
+  "name": "baoziyo/laravel-model-cache",
+  "description": "model cache",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "ogg",
+      "email": "baoziyoo@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Baoziyo\\ModelCache\\": "src"
+    }
+  },
+  "require": {
+    "php": ">=7.3",
+    "illuminate/support": "^7.0"
+  },
+  "require-dev": {
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Baoziyo\\ModelCache\\Providers\\Service"
+      ]
+    }
+  }
+}

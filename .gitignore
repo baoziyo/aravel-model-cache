@@ -1,0 +1,8 @@
+.phpcd
+.idea
+vendor
+composer.lock
+.php_cs.cache
+storage
+bin
+.php_cs.dist
