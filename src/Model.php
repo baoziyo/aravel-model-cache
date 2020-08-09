@@ -2,6 +2,7 @@
 
 namespace Baoziyo\ModelCache;
 
+use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model as BaseModel;
 
@@ -22,7 +23,7 @@ abstract class Model extends BaseModel
 
     protected function newBaseQueryBuilder()
     {
-        if ($this->disableCache) {
+        if ($this->disableCache || !$this->getRedis()->canUse()) {
             return $this->getConnection()->query();
         }
 
@@ -43,5 +44,10 @@ abstract class Model extends BaseModel
     public function newEloquentBuilder($query)
     {
         return new Builder($query);
+    }
+
+    private function getRedis(): RedisCache
+    {
+        return Container::getInstance()->make(RedisCache::class);
     }
 }

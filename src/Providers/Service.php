@@ -5,6 +5,7 @@ namespace Baoziyo\ModelCache\Providers;
 use Baoziyo\ModelCache\Console\Commands\Clear;
 use Baoziyo\ModelCache\Helper;
 use Baoziyo\ModelCache\RedisCache;
+use Illuminate\Contracts\Foundation\CachesConfiguration;
 use Illuminate\Support\ServiceProvider;
 
 class Service extends ServiceProvider
@@ -21,6 +22,12 @@ class Service extends ServiceProvider
         $this->publishes([
             $configPath => config_path('model-cache.php'),
         ], 'config');
+
+        if (!($this->app instanceof CachesConfiguration && $this->app->configurationIsCached())) {
+            $config = $this->app['config']->get('logging', []);
+            $config['channels'] += require __DIR__.'/../../config/logging.php';
+            $this->app['config']->set('logging', $config);
+        }
     }
 
     public function register()
@@ -34,8 +41,6 @@ class Service extends ServiceProvider
 
     private function getRedis()
     {
-        $redis = $this->app->make('redis');
-
-        return $redis::connection('modelCache');
+        return $this->app->make('redis')::connection('modelCache');
     }
 }
