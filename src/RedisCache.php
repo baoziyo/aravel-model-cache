@@ -2,7 +2,10 @@
 
 namespace Baoziyo\ModelCache;
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Str;
+use redis as redisService;
 
 class RedisCache
 {
@@ -31,7 +34,7 @@ class RedisCache
             return $queryBuilderObj();
         }
 
-        $this->redis::del($key);
+        $this->clearByKey($key);
 
         return $queryBuilderObj();
     }
@@ -59,6 +62,47 @@ class RedisCache
 
     public function flushAll()
     {
-        return $this->redis::del('*'.config('model-cache.cache-prefix', 'modelCache').':*');
+        return $this->clearByKey('*'.config('model-cache.cache-prefix', 'modelCache').':*');
+    }
+
+    public function canUse()
+    {
+        if (!extension_loaded('redis')) {
+            Log::channel('modelCache')->warning('redis扩展未安装');
+
+            return false;
+        }
+
+        try {
+            $redis = new redisService();
+            $redis->connect(env('REDIS_HOST', '127.0.0.1'), env('REDIS_PORT', '6379'));
+        } catch (\RedisException $e) {
+            Log::channel('modelCache')->warning('redis服务未启动');
+
+            return false;
+        }
+
+        return true;
+    }
+
+    private function clearByKey($key)
+    {
+        $keys = $this->redis::keys($key);
+        $chunkKeys = array_chunk($keys, 1000);
+
+        foreach ($chunkKeys as $chunkKey) {
+            $this->redis::pipeline(function ($pipe) use ($chunkKey) {
+                foreach ($chunkKey as $key) {
+                    $pipe->del($this->replacePrefix($key));
+                }
+            });
+        }
+
+        return true;
+    }
+
+    private function replacePrefix($key)
+    {
+        return str_replace(env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_database_'), '', $key);
     }
 }

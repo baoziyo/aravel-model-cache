@@ -2,6 +2,7 @@
   "name": "baoziyo/laravel-model-cache",
   "description": "model cache",
   "license": "MIT",
+  "version": "1.0.1",
   "authors": [
     {
       "name": "ogg",

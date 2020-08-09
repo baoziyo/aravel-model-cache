@@ -79,3 +79,6 @@ php artisan modelCache:clear
 app('modelCache')->clearCache();
 ```
 
+## 异常
+如有无法生效，则代表有异常，请在`storage/logs/cache-model.log`中查看
+

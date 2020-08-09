@@ -13,7 +13,7 @@ class Clear extends Command
 
     public function handle()
     {
-        if ($this->getRedis()->flushAll()) {
+        if ($this->getRedis()->canUse() && $this->getRedis()->flushAll()) {
             $this->info('清空成功.');
 
             return;
